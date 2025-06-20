@@ -12,61 +12,60 @@ Ensure you have Go installed and your project initialized as a Go module.
 
 ## Usage
 ### Basic Example
-The following demonstrates how `go-mapper` can map fields between structs, including custom transformations:
+Below is an example of how `go-mapper` can map fields between structs:
 ```go
 package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/davitostes/go-mapper/mapper"
-	"golang.org/x/crypto/bcrypt"
 )
 
-type createUserDto struct {
-	Name     string
-	Age      uint
-	Password string
+type user struct {
+	FirstName string
+	SurName   string
+	Age       uint
 }
 
-type user struct {
-	Name         string
-	Age          uint
-	PasswordHash string
+type readUserDto struct {
+	FirstName string
+	SurName   string
+	Age       uint
+	FullName  string
 }
 
 func main() {
-	profile, err := mapper.CreateProfile(createUserDto{}, user{})
+    // Creating mapping profile [user] -> [readUserDto]
+	profile, err := mapper.CreateProfile(user{}, readUserDto{})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-
-	profile.ForMember("PasswordHash", func(dto createUserDto) any {
-		hash, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return string(hash)
+    // Setting special mapper for FullName
+	profile.ForMember("FullName", func(src user) any {
+		return src.FirstName + " " + src.SurName
 	})
 
-	dto := createUserDto{Name: "davi", Age: 21, Password: "123"}
-	u := user{}
-
-	err = mapper.Map(dto, &u)
-	if err != nil {
-		log.Fatal(err)
+	u := user{
+		FirstName: "John",
+		SurName:   "Doe",
+		Age:       45,
 	}
 
-	fmt.Println(u)
+	dto := readUserDto{}
+
+    // Mapping to dto
+	err = mapper.Map(u, &dto)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(dto) // Output: {John Doe 45 John Doe}
 }
 ```
 
-## Examples
-Additional examples can be found in the `tests` directory, showcasing various use cases and advanced features.
-
-## Contributing
-Contributions to `go-mapper` are highly encouraged! Whether it's reporting bugs, suggesting features, or submitting pull requests, your input is invaluable. Please visit [GitHub](https://github.com/davitostes/go-mapper) to contribute or discuss.
+## Additional Examples
+Explore the `tests` directory for more examples demonstrating advanced use cases and error handling.
 
 ## Contact
-For questions, feedback, or support, reach out to the project maintainer at [Author Name](mailto:davisiqueira591@gmail.com).
+For questions, feedback, or support, reach out to the project maintainer at [Davi Tostes](mailto:davisiqueira591@gmail.com).

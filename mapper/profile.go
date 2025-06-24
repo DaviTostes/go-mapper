@@ -25,7 +25,7 @@ func CreateProfile[S, D any](source S, destiny D) (Profile[S, D], error) {
 	}
 
 	p := Profile[S, D]{Source: source, Destiny: destiny, Maps: make(map[string]func(src S) any)}
-	SaveStruct(p)
+	saveStruct(p)
 
 	return p, nil
 }

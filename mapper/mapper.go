@@ -24,7 +24,7 @@ func Map[S, D any](s S, d *D) error {
 	}
 	typD := valD.Type()
 
-	p, ok := LoadStruct[Profile[S, D]]()
+	p, ok := loadStruct[Profile[S, D]]()
 	if !ok {
 		return errors.New("Profile [" + typS.Name() + "] -> [" + typD.Name() + "] not found")
 	}

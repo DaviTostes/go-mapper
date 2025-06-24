@@ -7,12 +7,12 @@ import (
 
 var store sync.Map
 
-func SaveStruct(value any) {
+func saveStruct(value any) {
 	key := getStructKey(value)
 	store.Store(key, value)
 }
 
-func LoadStruct[T any]() (T, bool) {
+func loadStruct[T any]() (T, bool) {
 	var zero T
 	key := getStructKey(zero)
 

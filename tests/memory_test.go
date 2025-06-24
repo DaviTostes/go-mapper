@@ -19,7 +19,7 @@ type testUserDto struct {
 }
 
 func TestSaveAndLoadStruct(t *testing.T) {
-	mapper.CreateProfile(testUserDto{}, testUser{}, func() any { return "sas" })
+	mapper.CreateProfile(testUserDto{}, testUser{})
 
 	_, ok := mapper.LoadStruct[mapper.Profile[testUserDto, testUser]]()
 	if !ok {
@@ -35,7 +35,7 @@ func TestLoadWithoutSave(t *testing.T) {
 }
 
 func TestTypeMismatch(t *testing.T) {
-	mapper.CreateProfile(testUserDto{}, testUser{}, func() any { return "sas" })
+	mapper.CreateProfile(testUserDto{}, testUser{})
 
 	_, ok := mapper.LoadStruct[mapper.Profile[testUser, testUserDto]]()
 	if ok {

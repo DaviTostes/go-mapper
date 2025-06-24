@@ -2,6 +2,7 @@ package mapper
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -31,10 +32,20 @@ func Map[S, D any](s S, d *D) error {
 	for field, fn := range p.Maps {
 		value := fn(s)
 		dField := valD.FieldByName(field)
-		if dField.IsValid() && dField.CanSet() &&
-			reflect.TypeOf(value).AssignableTo(dField.Type()) {
-			dField.Set(reflect.ValueOf(value))
+		if !dField.IsValid() {
+			return errors.New("Field " + dField.String() + "has no value")
 		}
+		if !dField.CanSet() {
+			return errors.New("Field " + dField.String() + "can't be setted")
+		}
+
+		if !reflect.TypeOf(value).AssignableTo(dField.Type()) {
+			return errors.New(
+				fmt.Sprint("Cannot assign value '", value, "' to field ", dField.String()),
+			)
+		}
+
+		dField.Set(reflect.ValueOf(value))
 	}
 
 	for i := range typS.NumField() {

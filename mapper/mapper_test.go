@@ -133,3 +133,65 @@ func TestNested(t *testing.T) {
 		t.Fatal("Number not mapped correctly " + fmt.Sprint(dto))
 	}
 }
+
+func TestMapList(t *testing.T) {
+	profile, err := mapper.CreateProfile(testUser{}, testUserDto{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = profile.ForMember("FullName", func(src testUser) any {
+		return src.FirstName + " " + src.SurName
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	users := []testUser{
+		{
+			FirstName: "John",
+			SurName:   "Doe",
+			Age:       45,
+		},
+		{
+			FirstName: "Jane",
+			SurName:   "Smith",
+			Age:       32,
+		},
+		{
+			FirstName: "Bob",
+			SurName:   "Johnson",
+			Age:       28,
+		},
+	}
+
+	var dtos []testUserDto
+
+	err = mapper.MapList(users, &dtos)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(dtos) != len(users) {
+		t.Fatal("Mapped slice length does not match source slice length")
+	}
+
+	for i, u := range users {
+		dto := dtos[i]
+
+		if dto.Age != u.Age {
+			t.Fatal("Age not mapped correctly for user", i)
+		}
+
+		if dto.FirstName != u.FirstName {
+			t.Fatal("FirstName not mapped correctly for user", i)
+		}
+
+		if dto.SurName != u.SurName {
+			t.Fatal("SurName not mapped correctly for user", i)
+		}
+
+		if dto.FullName != u.FirstName+" "+u.SurName {
+			t.Fatal("FullName not mapped correctly for user", i)
+		}
+	}
+}

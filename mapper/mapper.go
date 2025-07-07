@@ -69,6 +69,37 @@ func Map[S, D any](s S, d *D) error {
 	return nil
 }
 
+func MapList[S, D any](src []S, dest *[]D) error {
+	if len(*dest) > 0 {
+		return errors.New("Destiny slice needs to be empty")
+	}
+
+	var wg sync.WaitGroup
+	errs := make(chan error, len(src))
+
+	destTemp := make([]D, len(src))
+	for i, s := range src {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			errs <- Map(s, &destTemp[i])
+		}()
+	}
+
+	wg.Wait()
+	close(errs)
+
+	for err := range errs {
+		if err != nil {
+			return err
+		}
+	}
+
+	*dest = destTemp
+
+	return nil
+}
+
 func checkAssignability(dField reflect.Value, dValue any) error {
 	if !dField.IsValid() {
 		return errors.New("Field " + dField.String() + " has no value")

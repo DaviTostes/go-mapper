@@ -8,20 +8,9 @@ import (
 
 func Map[S, D any](s S, d *D) error {
 	valS := reflect.ValueOf(s)
-	if valS.Kind() != reflect.Struct {
-		return errors.New("Source is not a struct")
-	}
 	typS := valS.Type()
 
-	typDP := reflect.TypeOf(d)
-	if typDP.Kind() != reflect.Ptr {
-		return errors.New("Destiny is not a pointer to a struct")
-	}
-
 	valD := reflect.ValueOf(d).Elem()
-	if valD.Kind() != reflect.Struct {
-		return errors.New("Destiny pointer is not to a struct")
-	}
 	typD := valD.Type()
 
 	p, ok := loadStruct[Profile[S, D]]()

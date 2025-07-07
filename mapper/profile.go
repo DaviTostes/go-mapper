@@ -11,8 +11,14 @@ type Profile[S, D any] struct {
 	Maps    map[string]func(src S) any
 }
 
-func (p *Profile[S, D]) ForMember(field string, fn func(src S) any) {
+func (p *Profile[S, D]) ForMember(field string, fn func(src S) any) error {
+	_, found := reflect.TypeOf(p.Destiny).FieldByName(field)
+	if !found {
+		return errors.New("Member " + field + " do not exists")
+	}
+
 	p.Maps[field] = fn
+	return nil
 }
 
 func CreateProfile[S, D any](source S, destiny D) (Profile[S, D], error) {

@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"fmt"
@@ -6,37 +6,37 @@ import (
 	"github.com/davitostes/go-mapper/mapper"
 )
 
-type Contact struct {
+type Contact02 struct {
 	Number string
 	Email  string
 }
 
-type User struct {
+type User02 struct {
 	Name    string
-	Contact Contact
+	Contact02 Contact02
 }
 
-type ContactDTO struct {
+type Contact02DTO struct {
 	Number string
 	Email  string
 }
 
-type UserDTO struct {
+type User02DTO struct {
 	Name    string
-	Contact ContactDTO
+	Contact02 Contact02DTO
 }
 
-func main() {
-	// Create mapping profile for User -> UserDTO
-	profile, err := mapper.CreateProfile(User{}, UserDTO{})
+func NestedMapping() {
+	// Create mapping profile for User02 -> User02DTO
+	profile, err := mapper.CreateProfile(User02{}, User02DTO{})
 	if err != nil {
 		panic(err)
 	}
 
 	// Configure nested struct mapping
-	err = profile.ForMember("Contact", func(src User) any {
-		contactDTO := ContactDTO{}
-		err := mapper.Map(src.Contact, &contactDTO)
+	err = profile.ForMember("Contact02", func(src User02) any {
+		contactDTO := Contact02DTO{}
+		err := mapper.Map(src.Contact02, &contactDTO)
 		if err != nil {
 			panic(err)
 		}
@@ -46,29 +46,29 @@ func main() {
 		panic(err)
 	}
 
-	// Create mapping profile for Contact -> ContactDTO
-	_, err = mapper.CreateProfile(Contact{}, ContactDTO{})
+	// Create mapping profile for Contact02 -> Contact02DTO
+	_, err = mapper.CreateProfile(Contact02{}, Contact02DTO{})
 	if err != nil {
 		panic(err)
 	}
 
 	// Create a sample user with nested contact
-	user := User{
+	user := User02{
 		Name: "John Doe",
-		Contact: Contact{
+		Contact02: Contact02{
 			Number: "303-4040",
 			Email:  "johndoe@email.com",
 		},
 	}
 
 	// Create destination DTO and perform mapping
-	dto := UserDTO{}
+	dto := User02DTO{}
 	err = mapper.Map(user, &dto)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("Mapped DTO: %+v\n", dto)
-	// Output: Mapped DTO: {Name:John Doe Contact:{Number:303-4040 Email:johndoe@email.com}}
+	// Output: Mapped DTO: {Name:John Doe Contact02:{Number:303-4040 Email:johndoe@email.com}}
 }
 
